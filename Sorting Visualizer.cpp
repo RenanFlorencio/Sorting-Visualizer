@@ -424,6 +424,16 @@ void insertionSort()
 }
 
 void selectionSortParallel()
+/*
+In selection sort you take the smallest element of the remaining
+array and put it up next to where you know it's sorted.
+
+Because of this, the swap is still not parallelizable.
+
+However, to choose the smallest element you need comparisons which
+are parallelizable, this code aims to explore this.
+
+*/
 {
     for(int i=0;i<arrSize-1;i++)
     {
