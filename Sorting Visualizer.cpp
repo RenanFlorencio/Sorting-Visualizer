@@ -376,7 +376,7 @@ you may use openMP for parallel computing.
                 visualize_parallel();
             }
 
-            this_thread::sleep_for(chrono::milliseconds(100));
+            this_thread::sleep_for(chrono::milliseconds(30));
 
             #pragma omp critical
             {
@@ -420,6 +420,57 @@ void insertionSort()
             SDL_Delay(5);
         }
         arr[j+1]=temp;
+    }
+}
+
+void selectionSortParallel()
+{
+    for(int i=0;i<arrSize-1;i++)
+    {
+        int minIndex = i;
+
+        #pragma omp parallel
+        {
+            int localMinIndex = minIndex;
+
+            #pragma omp for nowait
+            for(int j=i+1;j<arrSize;j++)
+            {
+                if(arr[j]<arr[localMinIndex])
+                {
+                    localMinIndex=j;
+                }
+            }
+            #pragma omp critical
+            if (arr[localMinIndex] < arr[minIndex]){
+                minIndex = localMinIndex;
+            }
+            
+        }
+        
+        int temp=arr[i];
+        arr[i]=arr[minIndex];
+        arr[minIndex]=temp;
+
+
+        #pragma omp critical
+        {
+            greenIndices.insert(i);
+            pinkIndices.insert(minIndex);
+        }
+
+        #pragma omp critical
+        {
+            visualize_parallel();
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(30));
+
+        #pragma omp critical
+        {
+            greenIndices.erase(i);
+            pinkIndices.erase(minIndex);
+        }
     }
 }
 
@@ -553,6 +604,13 @@ void execute()
                             complete=true;
                             cout<<"\nnPARALLEL BUBBLE SORT COMPLETE.\n";
                             break;
+                        case(SDLK_8):
+                            loadArr();
+                            cout<<"\nPARALLEL SELECTION SORT STARTED.\n";
+                            complete=false;
+                            selectionSortParallel();
+                            complete=true;
+                            cout<<"\nnPARALLEL SELECTION SORT COMPLETE.\n";
                     }
                 }
             }
@@ -574,6 +632,7 @@ bool controls()
          <<"    Use 5 to start Quick Sort Algorithm.\n"
          <<"    Use 6 to start Heap Sort Algorithm.\n"
          <<"    Use 7 to start parallel bubble Sort Algorithm.\n"
+         <<"    Use 8 to start parallel selection Sort Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
          <<"PRESS ENTER TO START SORTING VISUALIZER...\n\n"
          <<"Or type -1 and press ENTER to quit the program.";
