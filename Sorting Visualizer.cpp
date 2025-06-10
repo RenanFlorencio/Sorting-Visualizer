@@ -3,6 +3,11 @@
 #include<limits>
 #include<time.h>
 #include<string>
+#include<omp.h>
+#include <set>
+#include <thread>
+#include <chrono>
+
 using namespace std;
 
 const int SCREEN_WIDTH=910;
@@ -13,6 +18,9 @@ const int rectSize=7;
 
 int arr[arrSize];
 int Barr[arrSize];
+
+std::set<int> greenIndices; // for x and z
+std::set<int> pinkIndices;  // for y
 
 SDL_Window* window=NULL;
 SDL_Renderer* renderer=NULL;
@@ -64,6 +72,43 @@ void close()
 
     SDL_Quit();
 }
+
+void visualize_parallel()
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+
+    int j=0;
+    for(int i=0; i<=SCREEN_WIDTH-rectSize; i+=rectSize)
+    {
+        SDL_PumpEvents();
+
+        SDL_Rect rect={i, 0, rectSize, arr[j]};
+        if(complete)
+        {
+            SDL_SetRenderDrawColor(renderer, 100, 180, 100, 0);
+            SDL_RenderDrawRect(renderer, &rect);
+        }
+        else if (greenIndices.count(j))
+        {
+            SDL_SetRenderDrawColor(renderer, 100, 180, 100, 0); // green (highlighted swap or compare)
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else if (pinkIndices.count(j))
+        {
+            SDL_SetRenderDrawColor(renderer, 165, 105, 189, 0); // pink
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(renderer, 170, 183, 184, 0);
+            SDL_RenderDrawRect(renderer, &rect);
+        }
+        j++;
+    }
+    SDL_RenderPresent(renderer);
+}
+
 
 void visualize(int x=-1, int y=-1, int z=-1)
 {
@@ -293,6 +338,55 @@ void mergeSort(int a[], int si, int ei)
     merge2SortedArrays(a, si, ei);
 }
 
+void bubbleSortParallel()
+/*
+In general bubbleSort is sequential as comparisons move along
+the array. To parallelize this doesn't work.
+
+A possible solution is to first compare even-starting pairs
+and odd-starting pairs. In this manner in the same iteration
+one shift doesn't need to be sequential with the others, then
+you may use openMP for parallel computing.
+
+*/
+{
+    for (int i = 0; i < arrSize; i++)
+    {
+        int phase = i % 2;
+
+        #pragma omp parallel for
+        for (int j = phase; j < arrSize - 1; j += 2)
+        {
+            if (arr[j] > arr[j + 1])
+            {
+                // Swap
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+
+            #pragma omp critical
+            {
+                greenIndices.insert(j);
+                pinkIndices.insert(j + 1);
+            }
+
+            #pragma omp critical
+            {
+                visualize_parallel();
+            }
+
+            this_thread::sleep_for(chrono::milliseconds(100));
+
+            #pragma omp critical
+            {
+                greenIndices.erase(j);
+                pinkIndices.erase(j + 1);
+            }
+        }
+    }
+}
+
 void bubbleSort()
 {
     for(int i=0; i<arrSize-1; i++)
@@ -307,7 +401,6 @@ void bubbleSort()
 
                 visualize(j+1, j, arrSize-i);
             }
-            SDL_Delay(1);
         }
     }
 }
@@ -452,6 +545,14 @@ void execute()
                             complete=true;
                             cout<<"\nHEAP SORT COMPLETE.\n";
                             break;
+                        case(SDLK_7):
+                            loadArr();
+                            cout<<"\nPARALLEL BUBBLE SORT STARTED.\n";
+                            complete=false;
+                            bubbleSortParallel();
+                            complete=true;
+                            cout<<"\nnPARALLEL BUBBLE SORT COMPLETE.\n";
+                            break;
                     }
                 }
             }
@@ -472,6 +573,7 @@ bool controls()
          <<"    Use 4 to start Merge Sort Algorithm.\n"
          <<"    Use 5 to start Quick Sort Algorithm.\n"
          <<"    Use 6 to start Heap Sort Algorithm.\n"
+         <<"    Use 7 to start parallel bubble Sort Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
          <<"PRESS ENTER TO START SORTING VISUALIZER...\n\n"
          <<"Or type -1 and press ENTER to quit the program.";
