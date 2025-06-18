@@ -7,25 +7,37 @@
 #include <set>
 #include <thread>
 #include <chrono>
+#include<mutex>
 
 using namespace std;
 
-const int SCREEN_WIDTH=910;
-const int SCREEN_HEIGHT=750;
+const int SCREEN_WIDTH=1024;
+const int SCREEN_HEIGHT=700;
 
-const int arrSize=130;
-const int rectSize=7;
+const int arrSize=128;
+const int rectSize=1024/128;
 
 int arr[arrSize];
 int Barr[arrSize];
 
-std::set<int> greenIndices; // for x and z
-std::set<int> pinkIndices;  // for y
+mutex visualize_mutex;
+set<int> greenIndices;
+set<int> pinkIndices;
 
 SDL_Window* window=NULL;
 SDL_Renderer* renderer=NULL;
 
 bool complete=false;
+
+inline void busywait_ms(int milliseconds) {
+    using namespace std::chrono;
+    auto start = high_resolution_clock::now();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::high_resolution_clock::now() - start).count() < milliseconds){
+        // spin to keep the thread busy (avoids task stealing)
+        asm volatile("" ::: "memory");  // prevent loop from being optimized away
+    }
+}
 
 bool init()
 {
@@ -78,11 +90,11 @@ void visualize_parallel()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
+    lock_guard<mutex> lock(visualize_mutex);
+
     int j=0;
     for(int i=0; i<=SCREEN_WIDTH-rectSize; i+=rectSize)
     {
-        SDL_PumpEvents();
-
         SDL_Rect rect={i, 0, rectSize, arr[j]};
         if(complete)
         {
@@ -91,12 +103,12 @@ void visualize_parallel()
         }
         else if (greenIndices.count(j))
         {
-            SDL_SetRenderDrawColor(renderer, 100, 180, 100, 0); // green (highlighted swap or compare)
+            SDL_SetRenderDrawColor(renderer, 100, 180, 100, 0);
             SDL_RenderFillRect(renderer, &rect);
         }
         else if (pinkIndices.count(j))
         {
-            SDL_SetRenderDrawColor(renderer, 165, 105, 189, 0); // pink
+            SDL_SetRenderDrawColor(renderer, 165, 105, 189, 0);
             SDL_RenderFillRect(renderer, &rect);
         }
         else
@@ -338,6 +350,102 @@ void mergeSort(int a[], int si, int ei)
     merge2SortedArrays(a, si, ei);
 }
 
+void merge2SortedArraysParallel(int a[], int si, int ei)
+{
+    int size_output=(ei-si)+1;
+    int* output=new int[size_output];
+    int* support=new int[size_output];
+
+    int mid=(si+ei)/2;
+    int i=si, j=mid+1, k=0;
+    while(i<=mid && j<=ei)
+    {
+        if(a[i]<=a[j])
+        {
+            output[k]=a[i];
+            support[k] = i;
+            i++;
+            k++;
+        }
+        else
+        {
+            output[k]=a[j];
+            support[k] = j;
+            j++;
+            k++;
+        }
+
+    }
+    while(i<=mid)
+    {
+        output[k]=a[i];
+        support[k] = i;
+        i++;
+        k++;
+    }
+    while(j<=ei)
+    {
+        output[k]=a[j];
+        support[k] = j;
+        j++;
+        k++;
+    }
+    int x=0;
+    for(int l=si; l<=ei; l++)
+    {
+        a[l]=output[x];
+
+        #pragma omp critical
+        {
+            greenIndices.insert(l);
+        }
+        
+        #pragma omp critical
+        {
+            visualize_parallel();  
+            busywait_ms(15);
+        }
+        //busywait here
+        busywait_ms(45);
+
+        #pragma omp critical
+        {
+            greenIndices.erase(l);
+        }
+        x++;
+    }
+    delete []output;
+}
+
+void mergeSortParallelHelper(int a[], int si, int ei)
+{
+    if(si>=ei)
+    {
+        return;
+    }
+    int mid=(si+ei)/2;
+
+    #pragma omp task shared(a)
+    mergeSortParallelHelper(a, si, mid);
+
+    #pragma omp task shared(a)
+    mergeSortParallelHelper(a, mid+1, ei);
+
+    #pragma omp taskwait
+    merge2SortedArraysParallel(a, si, ei);
+}
+
+void mergeSortParallel(int a[], int si, int ei)
+{
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            mergeSortParallelHelper(a, si, ei);
+        }
+    }
+}
+
 void bubbleSortParallel()
 /*
 In general bubbleSort is sequential as comparisons move along
@@ -505,6 +613,45 @@ void selectionSort()
     }
 }
 
+void bitonicMerge(int low, int count, bool dir)
+{
+    if (count > 1)
+    {
+        int k = count / 2;
+        for (int i = low; i < low + k; i++)
+        {
+            if ((dir && arr[i] > arr[i + k]) || (!dir && arr[i] < arr[i + k]))
+            {
+                int temp = arr[i];
+                arr[i] = arr[i + k];
+                arr[i + k] = temp;
+                visualize(i, i + k);
+            }
+            SDL_Delay(10);
+        }
+        bitonicMerge(low, k, dir);
+        bitonicMerge(low + k, k, dir);
+    }
+}
+
+void bitonicSortRec(int low, int count, bool dir)
+{
+    if (count > 1)
+    {
+        int k = count / 2;
+
+        bitonicSortRec(low, k, true);   // ascending
+        bitonicSortRec(low + k, k, false); // descending
+
+        bitonicMerge(low, count, dir);
+    }
+}
+
+void bitonicSort()
+{
+    bitonicSortRec(0, arrSize, true);
+}
+
 void loadArr()
 {
     memcpy(arr, Barr, sizeof(int)*arrSize);
@@ -621,6 +768,20 @@ void execute()
                             selectionSortParallel();
                             complete=true;
                             cout<<"\nnPARALLEL SELECTION SORT COMPLETE.\n";
+                        case(SDLK_9):
+                            loadArr();
+                            cout<<"\nPARALLEL MERGE SORT STARTED.\n";
+                            complete=false;
+                            mergeSortParallel(arr, 0, arrSize - 1);
+                            complete=true;
+                            cout<<"\nnPARALLEL MERGE SORT COMPLETE.\n";
+                        case(SDLK_a):
+                            loadArr();
+                            cout<<"\nnBITONIC SORT STARTED.\n";
+                            complete=false;
+                            bitonicSort();
+                            complete=true;
+                            cout<<"\nnBITONIC SORT COMPLETE.\n";
                     }
                 }
             }
@@ -643,6 +804,8 @@ bool controls()
          <<"    Use 6 to start Heap Sort Algorithm.\n"
          <<"    Use 7 to start parallel bubble Sort Algorithm.\n"
          <<"    Use 8 to start parallel selection Sort Algorithm.\n"
+         <<"    Use 9 to start parallel merge Sort Algorithm.\n"
+         <<"    Use a to start bitonic Sort Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
          <<"PRESS ENTER TO START SORTING VISUALIZER...\n\n"
          <<"Or type -1 and press ENTER to quit the program.";
@@ -680,7 +843,7 @@ void intro()
 int main(int argc, char* args[])
 {
     intro();
-
+    omp_set_num_threads(4);
     while(1)
     {
         cout<<'\n';
