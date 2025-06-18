@@ -640,8 +640,8 @@ void bitonicSortRec(int low, int count, bool dir)
     {
         int k = count / 2;
 
-        bitonicSortRec(low, k, true);   // ascending
-        bitonicSortRec(low + k, k, false); // descending
+        bitonicSortRec(low, k, true);
+        bitonicSortRec(low + k, k, false);
 
         bitonicMerge(low, count, dir);
     }
@@ -651,6 +651,79 @@ void bitonicSort()
 {
     bitonicSortRec(0, arrSize, true);
 }
+
+void bitonicMergeParallel(int a[], int low, int count, bool dir)
+{
+    if(count > 1)
+    {
+        int k = count / 2;
+        for(int i = low; i < low + k; i++)
+        {
+            #pragma omp critical
+            {
+                greenIndices.insert(i);
+                greenIndices.insert(i + k);
+            }
+
+            #pragma omp critical
+            {
+                visualize_parallel();
+                busywait_ms(15);
+            }
+
+            if((dir && a[i] > a[i + k]) || (!dir && a[i] < a[i + k]))
+            {
+                int temp = a[i];
+                a[i] = a[i + k];
+                a[i + k] = temp;
+
+                busywait_ms(45);
+            }
+
+            #pragma omp critical
+            {
+                greenIndices.erase(i);
+                greenIndices.erase(i + k);
+            }
+        }
+        bitonicMergeParallel(a, low, k, dir);
+        bitonicMergeParallel(a, low + k, k, dir);
+    }
+}
+
+void bitonicSortParallelHelper(int a[], int low, int count, bool dir)
+{
+    if(count > 1)
+    {
+        int k = count / 2;
+
+        #pragma omp task shared(a)
+        bitonicSortParallelHelper(a, low, k, true);
+
+        #pragma omp task shared(a)
+        bitonicSortParallelHelper(a, low + k, k, false);
+
+        #pragma omp taskwait
+        bitonicMergeParallel(a, low, count, dir);
+    }
+}
+
+void bitonicSortParallel(int a[], int size)
+{
+    #pragma omp critical
+    {
+        visualize_parallel();
+        busywait_ms(300);
+    }
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            bitonicSortParallelHelper(a, 0, size, true);
+        }
+    }
+}
+
 
 void loadArr()
 {
@@ -768,6 +841,7 @@ void execute()
                             selectionSortParallel();
                             complete=true;
                             cout<<"\nnPARALLEL SELECTION SORT COMPLETE.\n";
+                            break;
                         case(SDLK_9):
                             loadArr();
                             cout<<"\nPARALLEL MERGE SORT STARTED.\n";
@@ -775,6 +849,7 @@ void execute()
                             mergeSortParallel(arr, 0, arrSize - 1);
                             complete=true;
                             cout<<"\nnPARALLEL MERGE SORT COMPLETE.\n";
+                            break;
                         case(SDLK_a):
                             loadArr();
                             cout<<"\nnBITONIC SORT STARTED.\n";
@@ -782,6 +857,15 @@ void execute()
                             bitonicSort();
                             complete=true;
                             cout<<"\nnBITONIC SORT COMPLETE.\n";
+                            break;
+                        case(SDLK_s):
+                            loadArr();
+                            cout<<"\nnBITONIC SORT PARALLEL STARTED.\n";
+                            complete=false;
+                            bitonicSortParallel(arr, arrSize);
+                            complete=true;
+                            cout<<"\nnBITONIC SORT PARALLEL COMPLETE.\n";
+                            break;
                     }
                 }
             }
@@ -806,6 +890,7 @@ bool controls()
          <<"    Use 8 to start parallel selection Sort Algorithm.\n"
          <<"    Use 9 to start parallel merge Sort Algorithm.\n"
          <<"    Use a to start bitonic Sort Algorithm.\n"
+         <<"    Use s to start bitonic Sort Parallel Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
          <<"PRESS ENTER TO START SORTING VISUALIZER...\n\n"
          <<"Or type -1 and press ENTER to quit the program.";
