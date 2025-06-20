@@ -260,15 +260,31 @@ void heapify_parallel(int* arr, int n, int i)
 }
 
 void heapSortParallel(int* arr, int n)
+/*
+Heap Sort builds a max-heap and repeatedly removes the largest element 
+(from the root), placing it at the end of the array. The heap size is 
+reduced each time, and the process is repeated.
+
+In this implementation, the max-heap construction is parallelized: 
+multiple internal nodes can be heapified simultaneously since their 
+subtrees do not overlap. This part is safe and effective for parallelism.
+
+However, the sorting phase (swapping the root with the last element and 
+heapifying the root) must remain sequential, because each iteration depends 
+on the heap being correctly adjusted after the previous removal.
+
+The 'heapify_parallel' function recursively restores the max-heap property 
+for the subtree rooted at index `i`. Visual feedback is handled using 
+critical sections to ensure thread-safe updates and synchronized animations.
+
+*/
 {
-    // construção paralela do max heap
     #pragma omp parallel for schedule(dynamic)
     for (int i = n / 2 - 1; i >= 0; i--)
     {
         heapify_parallel(arr, n, i);
     }
 
-    // sort (não paralelizável diretamente)
     for (int i = n - 1; i > 0; i--)
     {
         std::swap(arr[0], arr[i]);
@@ -282,7 +298,6 @@ void heapSortParallel(int* arr, int n)
             greenIndices.erase(0);
             pinkIndices.erase(i);
         }
-        // tamanho do heap reduzido
         heapify_parallel(arr, i, 0); 
     }
 }
@@ -450,6 +465,27 @@ int partition_array_parallel(int a[], int si, int ei)
 
 
 void quickSortParallel(int a[], int si, int ei, int depth)
+/*
+Quick Sort selects a pivot and partitions the array such that all elements 
+less than or equal to the pivot go to its left, and greater elements go to 
+its right. It then recursively applies the same process to the two subarrays.
+
+This parallel version optimizes the partitioning step: comparisons with 
+the pivot are done in parallel using a helper array (`isSmaller`) and 
+OpenMP reduction to count how many elements are smaller than the pivot. 
+This part is highly parallelizable and benefits from multiple threads.
+
+However, rearranging elements around the pivot (swapping from both ends) 
+remains sequential due to data dependencies between indices.
+
+Recursive calls to Quick Sort are parallelized using `#pragma omp task`, 
+limited by a depth counter (`depth`) to avoid excessive thread spawning 
+for small subarrays. While `depth > 0`, subproblems are run as tasks.
+
+All visualizations are enclosed in critical sections to ensure consistent 
+highlighting of indices and proper synchronization of animations.
+*/
+
 {
     if (si >= ei)
         return;
