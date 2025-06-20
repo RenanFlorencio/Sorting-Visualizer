@@ -230,6 +230,64 @@ void inplaceHeapSort(int* input, int n)
     }
 }
 
+void heapify_parallel(int* arr, int n, int i)
+{
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    if (largest != i)
+    {
+        std::swap(arr[i], arr[largest]);
+
+        #pragma omp critical
+        {
+            greenIndices.insert(i);
+            pinkIndices.insert(largest);
+            visualize_parallel();
+            busywait_ms(30);
+            greenIndices.erase(i);
+            pinkIndices.erase(largest);
+        }
+
+        heapify_parallel(arr, n, largest);
+    }
+}
+
+void heapSortParallel(int* arr, int n)
+{
+    // construção paralela do max heap
+    #pragma omp parallel for schedule(dynamic)
+    for (int i = n / 2 - 1; i >= 0; i--)
+    {
+        heapify_parallel(arr, n, i);
+    }
+
+    // sort (não paralelizável diretamente)
+    for (int i = n - 1; i > 0; i--)
+    {
+        std::swap(arr[0], arr[i]);
+
+        #pragma omp critical
+        {
+            greenIndices.insert(0);
+            pinkIndices.insert(i);
+            visualize_parallel();
+            busywait_ms(40);
+            greenIndices.erase(0);
+            pinkIndices.erase(i);
+        }
+        // tamanho do heap reduzido
+        heapify_parallel(arr, i, 0); 
+    }
+}
+
+
 int partition_array(int a[], int si, int ei)
 {
     int count_small=0;
@@ -998,6 +1056,14 @@ void execute()
                             complete=true;
                             cout<<"\nQUICK SORT PARALLEL COMPLETE.\n";
                             break;
+                        case(SDLK_h):
+                            loadArr();
+                            cout<<"\nHEAP SORT PARALLEL STARTED.\n";
+                            complete=false;
+                            inplaceHeapSort(arr, arrSize);
+                            complete=true;
+                            cout<<"\nHEAP SORT PARALLEL COMPLETE.\n";
+                            break;
                     }
                 }
             }
@@ -1024,6 +1090,7 @@ bool controls()
          <<"    Use a to start bitonic Sort Algorithm.\n"
          <<"    Use s to start bitonic Sort Parallel Algorithm.\n"
          <<"    Use k to start quick Sort Parallel Algorithm.\n"
+         <<"    Use h to start heap Sort Parallel Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
          <<"PRESS ENTER TO START SORTING VISUALIZER...\n\n"
          <<"Or type -1 and press ENTER to quit the program.";
