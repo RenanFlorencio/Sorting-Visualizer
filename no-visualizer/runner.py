@@ -5,18 +5,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def main():
-    # n_elements_array = [12, 14, 15, 16, 17, 18, 19, 20, 21] # These are the powers of 2 for the number of elements
-    n_elements_array = [10, 12, 14, 15, 16] # These are the powers of 2 for the number of elements
 
-    n_iterations = 10
+    # Since bubble and selection sort are too slow, use the smaller number of elements
+    # The values are the exponents of 2 for the number of elements
+
+    # n_elements_array = [12, 14, 15, 16, 17, 18, 19, 20, 21] # Merge and Bitonic sort
+    n_elements_array = [10, 12, 14, 15, 16] # Bubble and Selection sort
+
     sort_functions = ['bubbleSort', 'selectionSort']
     # sort_functions = ['mergeSort', 'bitonicSort']
 
+    n_iterations = 10 # Number of iterations for each number of elements for each sort
     serial_time = {}
     parallel_time = {}
 
     for sort in sort_functions:
-        serial_time[sort] = {} # Each sort will hold a mean value for each n_elements
+        serial_time[sort] = {}
         parallel_time[sort] = {}
 
         for n in n_elements_array:
@@ -33,7 +37,7 @@ def main():
                 p_time = values[1]
                 print(output)
 
-                serial_time[sort][n].append(float(s_time))            
+                serial_time[sort][n].append(float(s_time)) # This holds a list of times for each n  
                 parallel_time[sort][n].append(float(p_time))
 
     print("Serial time DataFrame")
@@ -55,10 +59,10 @@ def main():
         p_mean = np.mean(p_values, axis=1)
         s_std = np.std(s_values, axis=1)
         p_std = np.std(p_values, axis=1)
-        s_ci = 1.96 * s_std / np.sqrt(n_iterations)
+        s_ci = 1.96 * s_std / np.sqrt(n_iterations) # 95% confidence interval
         p_ci = 1.96 * p_std / np.sqrt(n_iterations)
 
-        speedup[sort] = s_mean / p_mean
+        speedup[sort] = s_mean / p_mean # Calculate speedup for each sort
 
         print(f"Serial mean for {sort}: {s_mean}")
         print(f"Parallel mean for {sort}: {p_mean}")
@@ -77,6 +81,7 @@ def main():
         plt.savefig(f"plots/{sort}_time.png")
         plt.close()
     
+    # Save the speedup data to a CSV file
     sort_str = "_".join(sort_functions)
     pd.DataFrame(speedup, index=n_elements_array).to_csv(f"speedup_{sort_str}.csv")
 
