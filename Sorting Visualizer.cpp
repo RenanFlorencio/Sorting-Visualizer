@@ -1,13 +1,15 @@
-#include<SDL2/SDL.h>
-#include<iostream>
-#include<limits>
-#include<time.h>
-#include<string>
-#include<omp.h>
+#include <SDL2/SDL.h>
+#include <iostream>
+#include <limits>
+#include <time.h>
+#include <string>
+#include <omp.h>
 #include <set>
 #include <thread>
 #include <chrono>
-#include<mutex>
+#include <mutex>
+#include <vector>
+
 
 using namespace std;
 
@@ -284,6 +286,128 @@ void quickSort(int a[], int si, int ei)
     quickSort(a, si, c-1);
     quickSort(a, c+1, ei);
 
+}
+
+int partition_array_parallel(int a[], int si, int ei)
+{
+    int pivot = a[si];
+    int count_small = 0;
+
+    // Flags para marcar quem é menor que o pivô
+    std::vector<int> isSmaller(ei - si, 0);
+
+    // Comparações paralelas com destaque visual
+    #pragma omp parallel for reduction(+:count_small)
+    for (int i = si + 1; i <= ei; i++) {
+        // Marcação de comparação
+        #pragma omp critical
+        {
+            greenIndices.insert(i);
+            pinkIndices.insert(si);
+        }
+
+        #pragma omp critical
+        {
+            visualize_parallel();
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+        #pragma omp critical
+        {
+            greenIndices.erase(i);
+            pinkIndices.erase(si);
+        }
+
+        if (a[i] <= pivot) {
+            isSmaller[i - (si + 1)] = 1;
+            count_small++;
+        }
+    }
+
+    int c = si + count_small;
+
+    // Troca visualizada do pivô para a posição correta
+    std::swap(a[c], a[si]);
+
+    #pragma omp critical
+    {
+        greenIndices.insert(c);
+        pinkIndices.insert(si);
+    }
+
+    #pragma omp critical
+    {
+        visualize_parallel();
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
+    #pragma omp critical
+    {
+        greenIndices.erase(c);
+        pinkIndices.erase(si);
+    }
+
+    // Rearranjar os elementos à esquerda e direita do pivô (sequencial)
+    int i = si, j = ei;
+
+    while (i < c && j > c)
+    {
+        if (a[i] <= a[c]) {
+            i++;
+        }
+        else if (a[j] > a[c]) {
+            j--;
+        }
+        else {
+            std::swap(a[i], a[j]);
+
+            #pragma omp critical
+            {
+                greenIndices.insert(i);
+                pinkIndices.insert(j);
+            }
+
+            #pragma omp critical
+            {
+                visualize_parallel();
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
+            #pragma omp critical
+            {
+                greenIndices.erase(i);
+                pinkIndices.erase(j);
+            }
+
+            i++;
+            j--;
+        }
+    }
+
+    return c;
+}
+
+
+void quickSortParallel(int a[], int si, int ei, int depth)
+{
+    if (si >= ei)
+        return;
+
+    int c = partition_array_parallel(a, si, ei);
+
+    if (depth > 0) {
+        #pragma omp task shared(a)
+        quickSortParallel(a, si, c - 1, depth - 1);
+
+        #pragma omp task shared(a)
+        quickSortParallel(a, c + 1, ei, depth - 1);
+    } else {
+        quickSortParallel(a, si, c - 1, 0);
+        quickSortParallel(a, c + 1, ei, 0);
+    }
 }
 
 void merge2SortedArrays(int a[], int si, int ei)
@@ -832,7 +956,7 @@ void execute()
                             complete=false;
                             bubbleSortParallel();
                             complete=true;
-                            cout<<"\nnPARALLEL BUBBLE SORT COMPLETE.\n";
+                            cout<<"\nPARALLEL BUBBLE SORT COMPLETE.\n";
                             break;
                         case(SDLK_8):
                             loadArr();
@@ -840,7 +964,7 @@ void execute()
                             complete=false;
                             selectionSortParallel();
                             complete=true;
-                            cout<<"\nnPARALLEL SELECTION SORT COMPLETE.\n";
+                            cout<<"\nPARALLEL SELECTION SORT COMPLETE.\n";
                             break;
                         case(SDLK_9):
                             loadArr();
@@ -848,23 +972,31 @@ void execute()
                             complete=false;
                             mergeSortParallel(arr, 0, arrSize - 1);
                             complete=true;
-                            cout<<"\nnPARALLEL MERGE SORT COMPLETE.\n";
+                            cout<<"\nPARALLEL MERGE SORT COMPLETE.\n";
                             break;
                         case(SDLK_a):
                             loadArr();
-                            cout<<"\nnBITONIC SORT STARTED.\n";
+                            cout<<"\nBITONIC SORT STARTED.\n";
                             complete=false;
                             bitonicSort();
                             complete=true;
-                            cout<<"\nnBITONIC SORT COMPLETE.\n";
+                            cout<<"\nBITONIC SORT COMPLETE.\n";
                             break;
                         case(SDLK_s):
                             loadArr();
-                            cout<<"\nnBITONIC SORT PARALLEL STARTED.\n";
+                            cout<<"\nBITONIC SORT PARALLEL STARTED.\n";
                             complete=false;
                             bitonicSortParallel(arr, arrSize);
                             complete=true;
-                            cout<<"\nnBITONIC SORT PARALLEL COMPLETE.\n";
+                            cout<<"\nBITONIC SORT PARALLEL COMPLETE.\n";
+                            break;
+                        case(SDLK_k):
+                            loadArr();
+                            cout<<"\nQUICK SORT PARALLEL STARTED.\n";
+                            complete=false;
+                            quickSortParallel(arr, 0, arrSize-1, 16);
+                            complete=true;
+                            cout<<"\nQUICK SORT PARALLEL COMPLETE.\n";
                             break;
                     }
                 }
@@ -891,6 +1023,7 @@ bool controls()
          <<"    Use 9 to start parallel merge Sort Algorithm.\n"
          <<"    Use a to start bitonic Sort Algorithm.\n"
          <<"    Use s to start bitonic Sort Parallel Algorithm.\n"
+         <<"    Use k to start quick Sort Parallel Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
          <<"PRESS ENTER TO START SORTING VISUALIZER...\n\n"
          <<"Or type -1 and press ENTER to quit the program.";
