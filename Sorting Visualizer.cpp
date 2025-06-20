@@ -1046,13 +1046,13 @@ void execute()
                             break;
                         case(SDLK_7):
                             loadArr();
-                            cout<<"\nPARALLEL BUBBLE SORT STARTED.\n";
+                            cout<<"\nBITONIC SORT STARTED.\n";
                             complete=false;
-                            bubbleSortParallel();
+                            bitonicSort();
                             complete=true;
-                            cout<<"\nPARALLEL BUBBLE SORT COMPLETE.\n";
+                            cout<<"\nBITONIC SORT COMPLETE.\n";
                             break;
-                        case(SDLK_8):
+                        case(SDLK_a):
                             loadArr();
                             cout<<"\nPARALLEL SELECTION SORT STARTED.\n";
                             complete=false;
@@ -1060,7 +1060,15 @@ void execute()
                             complete=true;
                             cout<<"\nPARALLEL SELECTION SORT COMPLETE.\n";
                             break;
-                        case(SDLK_9):
+                        case(SDLK_b):
+                            loadArr();
+                            cout<<"\nPARALLEL BUBBLE SORT STARTED.\n";
+                            complete=false;
+                            bubbleSortParallel();
+                            complete=true;
+                            cout<<"\nPARALLEL BUBBLE SORT COMPLETE.\n";
+                            break;
+                        case(SDLK_c):
                             loadArr();
                             cout<<"\nPARALLEL MERGE SORT STARTED.\n";
                             complete=false;
@@ -1068,37 +1076,29 @@ void execute()
                             complete=true;
                             cout<<"\nPARALLEL MERGE SORT COMPLETE.\n";
                             break;
-                        case(SDLK_a):
+                        case(SDLK_d):
                             loadArr();
-                            cout<<"\nBITONIC SORT STARTED.\n";
-                            complete=false;
-                            bitonicSort();
-                            complete=true;
-                            cout<<"\nBITONIC SORT COMPLETE.\n";
-                            break;
-                        case(SDLK_s):
-                            loadArr();
-                            cout<<"\nBITONIC SORT PARALLEL STARTED.\n";
-                            complete=false;
-                            bitonicSortParallel(arr, arrSize);
-                            complete=true;
-                            cout<<"\nBITONIC SORT PARALLEL COMPLETE.\n";
-                            break;
-                        case(SDLK_k):
-                            loadArr();
-                            cout<<"\nQUICK SORT PARALLEL STARTED.\n";
+                            cout<<"\nPARALLEL QUICK SORT STARTED.\n";
                             complete=false;
                             quickSortParallel(arr, 0, arrSize-1, 16);
                             complete=true;
-                            cout<<"\nQUICK SORT PARALLEL COMPLETE.\n";
+                            cout<<"\nPARALLEL QUICK SORT COMPLETE.\n";
                             break;
-                        case(SDLK_h):
+                        case(SDLK_e):
                             loadArr();
-                            cout<<"\nHEAP SORT PARALLEL STARTED.\n";
+                            cout<<"\nPARALLEL HEAP SORT STARTED.\n";
                             complete=false;
                             inplaceHeapSort(arr, arrSize);
                             complete=true;
-                            cout<<"\nHEAP SORT PARALLEL COMPLETE.\n";
+                            cout<<"\nPARALLEL HEAP SORT COMPLETE.\n";
+                            break;
+                        case(SDLK_f):
+                            loadArr();
+                            cout<<"\nPARALLEL BITONIC SORT STARTED.\n";
+                            complete=false;
+                            bitonicSortParallel(arr, arrSize);
+                            complete=true;
+                            cout<<"\nPARALLEL BITONIC SORT COMPLETE.\n";
                             break;
                     }
                 }
@@ -1111,8 +1111,7 @@ void execute()
 
 bool controls()
 {
-    cout <<"WARNING: Giving repetitive commands may cause latency and the visualizer may behave unexpectedly. Please give a new command only after the current command's execution is done.\n\n"
-         <<"Available Controls inside Sorting Visualizer:-\n"
+    cout <<"Available Commands inside Sorting Visualizer:\n"
          <<"    Use 0 to Generate a different randomized list.\n"
          <<"    Use 1 to start Selection Sort Algorithm.\n"
          <<"    Use 2 to start Insertion Sort Algorithm.\n"
@@ -1120,16 +1119,21 @@ bool controls()
          <<"    Use 4 to start Merge Sort Algorithm.\n"
          <<"    Use 5 to start Quick Sort Algorithm.\n"
          <<"    Use 6 to start Heap Sort Algorithm.\n"
-         <<"    Use 7 to start parallel bubble Sort Algorithm.\n"
-         <<"    Use 8 to start parallel selection Sort Algorithm.\n"
-         <<"    Use 9 to start parallel merge Sort Algorithm.\n"
-         <<"    Use a to start bitonic Sort Algorithm.\n"
-         <<"    Use s to start bitonic Sort Parallel Algorithm.\n"
-         <<"    Use k to start quick Sort Parallel Algorithm.\n"
-         <<"    Use h to start heap Sort Parallel Algorithm.\n"
+         <<"    Use 7 to start Bitonic Sort Algorithm.\n"
+         <<"    Use a to start Parallel Selection Sort Algorithm.\n"
+         <<"    Use b to start Parallel Bubble Sort Algorithm.\n"
+         <<"    Use c to start Parallel Merge Sort Algorithm.\n"
+         <<"    Use d to start Parallel Quick Sort Algorithm.\n"
+         <<"    Use e to start Parallel Heap Sort Algorithm.\n"
+         <<"    Use f to start Parallel Bitonic Sort Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
+
+         <<"WARNING: Giving repetitive commands may cause latency and the visualizer may behave unexpectedly. Please give a new command only after the current command's execution is done.\n\n"
+         <<"THIS IS HOW THE SORTING VISUALIZER WORKS:\n\n"
+         <<"  - Once you press ENTER, the visualizer window will open. Click on the window and press the command you'd like to execute, to see the visualization of the algorithm you chose.\n"
+         <<"  - To quit the program, you should exit the visualizer window pressing 'q' key, and then, type -1 in the terminal and press ENTER to quit the program.\n\n"
          <<"PRESS ENTER TO START SORTING VISUALIZER...\n\n"
-         <<"Or type -1 and press ENTER to quit the program.";
+         <<"Or type -1 on the terminal and press ENTER to quit the program.";
 
     string s;
     getline(cin, s);
