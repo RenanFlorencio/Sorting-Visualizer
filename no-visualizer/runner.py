@@ -9,11 +9,13 @@ def main():
     # Since bubble and selection sort are too slow, use the smaller number of elements
     # The values are the exponents of 2 for the number of elements
 
-    # n_elements_array = [12, 14, 15, 16, 17, 18, 19, 20, 21] # Merge and Bitonic sort
-    n_elements_array = [10, 12, 14, 15, 16] # Bubble and Selection sort
-
-    sort_functions = ['bubbleSort', 'selectionSort']
-    # sort_functions = ['mergeSort', 'bitonicSort']
+    # n_elements_array = [12, 14, 15, 16, 17, 18, 19, 20, 21] # Merge, Bitonic, and Heap sort
+    # n_elements_array = [10, 12, 14, 15, 16] # Bubble, Selection, and Quick sort
+    n_elements_array = [5, 6, 7, 8, 9, ] # Quick sort
+    
+    # sort_functions = ['mergeSort', 'bitonicSort', 'heapSort']
+    # sort_functions = ['bubbleSort', 'selectionSort', 'quickSort']
+    sort_functions = ['quickSort']
 
     n_iterations = 10 # Number of iterations for each number of elements for each sort
     serial_time = {}
