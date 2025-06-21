@@ -1,6 +1,6 @@
 # Serial and Parallel Sorting Visualizer
 
-This is the final project for Unicamp MC970 course, done by Felipe Brabes, Gabriela Jacob and Renan Florencio. It is based on Dipesh Mann's implementation of Sorting Visualizer (which was forked), with some changes described below.
+This is the final project for Unicamp MC970 course, done by Felipe Brabes, Gabriela Jacob and Renan Florencio. It is based on [Dipesh Mann's implementation of Sorting Visualizer](https://github.com/dipesh-m/Sorting-Visualizer), with some changes described below.
 
 The original code done by Dipesh Mann is a sorting algorithms visualizer, which provided a visualization of different sorting algorithms in C++ with SDL2 Library. The code originally implemented the following sorting algorithms:
 
@@ -26,13 +26,11 @@ To run the Visualizer, you need to do the following:
 On Debian or Ubuntu, you can do it using the following command:
 ```
 sudo apt install libsdl2-dev
-
 ```
 2. Run the following command:
 ```
 g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer
 ./visualizer
-
 ```
 3. Follow the instructions of the Sorting Visualizer printed on the terminal: press ENTER twice to start the visualizer, and, once it starts, press the commands shown to run the desired sorting algorithm, to generate a new list or to quit the visualizer. To close the program, quit the visualizer and then write '-1' and press ENTER.
 
@@ -40,51 +38,89 @@ g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer
 
 ## Samples - INSERT THE GIF
 
-- Selection Sort - serial
-- Selection Sort - parallel
+- Selection Sort - serial  
+    ![](samples/selectionSortSerial.gif)
 
-- Insertion Sort - serial
-- Insertion Sort - parallel
+- Selection Sort - parallel  
+    ![](samples/selectionSortParallel.gif)
 
-- Bubble Sort - serial
-- Bubble Sort - parallel
+- Insertion Sort - serial  
+    ![](samples/insertionSortSerial.gif)
 
-- Merge Sort - serial
-- Merge Sort - parallel
+- Insertion Sort - parallel  
+    ![](samples/insertionSortParallel.gif)
 
-- Quick Sort - serial
-- Quick Sort - parallel
+- Bubble Sort - serial  
+    ![](samples/bubbleSortSerial.gif)
 
-- Heap Sort - serial
-- Heap Sort - parallel
+- Bubble Sort - parallel  
+    ![](samples/bubbleSortParallel.gif)
 
-- Bitonic Sort - serial
-- Bitonic Sort - parallel
+- Merge Sort - serial  
+    ![](samples/mergeSortSerial.gif)
+
+- Merge Sort - parallel  
+    ![](samples/mergeSortParallel.gif)
+
+- Quick Sort - serial  
+    ![](samples/quickSortSerial.gif)
+
+- Quick Sort - parallel  
+    ![](samples/quickSortParallel.gif)
+
+- Heap Sort - serial  
+    ![](samples/heapSortSerial.gif)
+
+- Heap Sort - parallel  
+    ![](samples/heapSortParallel.gif)
+
+- Bitonic Sort - serial  
+    ![](samples/bitonicSortSerial.gif)
+
+- Bitonic Sort - parallel  
+    ![](samples/bitonicSortParallel.gif)
 
 
 ## How to run runner.py
 
-The runner takes some time to finish, and the benchmarks are already in this readme. However, if you'd like to run the runner yourself, you can simply do the following:
+The runner takes some time to finish, and the benchmarks are already in this README. However, if you'd like to benchmark it yourself, you can simply do the following:
 
-1. Compile each sorting algorithm, to make sure it works on your system. You can try to skip this step, but we observed that it can generate some errors due to different versions of glibc and other libraries, so we recommend you to do this to make sure it will work on your environment. To do this, use the following commands:
+1. Compile each sorting algorithm, to make sure it works on your system. You can try to skip this step, but we observed that it can generate some errors due to different versions of glibc and other libraries, so we recommend you to do this to make sure it will work on your environment. To do this, inside the root folder (sorting-visualizer) use the following commands:
 
+```
+cd no-visualizer
+cd src
+g++ algSort.cpp -w -lSDL2 -o algSort -fopenmp
+```
 
+Compile each of the sorting algorithms, substituting "alg" for their name. For example: `g++ heapSort.cpp -w -lSDL2 -o heapSort -fopenmp`. This will compile both the serial and parallel versions of each algorithm.
 
-
-
-
-
-
-
-
-
-
+2. Move the generated files to the no-visualiser folder
 
 
+3. Run the followng:
+
+```
+python3 runner.py
+```
 
 
-# This is the orignal README for this project:
-# Sorting Visualizer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### This is the orignal README for this project, which explains better how the Sorting Visualizer works:
 
 [Download](https://github.com/dipesh-m/Sorting-Visualizer/releases/tag/1.0)
 
