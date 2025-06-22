@@ -188,8 +188,8 @@ int main(int argc, char* argv[]) {
     auto endB = std::chrono::high_resolution_clock::now();
     auto durationB = std::chrono::duration_cast<std::chrono::milliseconds>(endB - startB).count();
 
-    std::cout << "Merge Sort time: " << durationA << " ms\n";
-    std::cout << "Merge Sort Parallel time: " << durationB << " ms\n";
+    std::cout << "Quick Sort time: " << durationA << " ms\n";
+    std::cout << "Quick Sort Parallel time: " << durationB << " ms\n";
 
     delete[] arr;
     delete[] arrCopy;
