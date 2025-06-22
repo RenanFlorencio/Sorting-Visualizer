@@ -14,6 +14,7 @@ The original code done by Dipesh Mann is a sorting algorithms visualizer, which 
 The main changes we did to this code was:
 
 - Optimize by implementing a parallel version for all of the sorting algorithms already implemented
+- Implement the logic for the parallel algorithms visualization
 - Implement a different sorting algorithm (Bitonic Sort) and its parallel version
 - Implement an automated runner, which benchmarks all of the algorithms implemented and returns a table with running times for each of the algorithms, comparing the parallel and serial versions
 
