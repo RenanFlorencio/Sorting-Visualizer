@@ -10,7 +10,7 @@
 #include <mutex>
 #include <vector>
 
-int partition_array(int a[], int si, int ei)
+int partitionArray(int a[], int si, int ei)
 {
     int count_small=0;
 
@@ -58,16 +58,53 @@ void quickSort(int a[], int si, int ei)
         return;
     }
 
-    int c=partition_array(a, si, ei);
+    int c=partitionArray(a, si, ei);
     quickSort(a, si, c-1);
     quickSort(a, c+1, ei);
 
 }
 
+int partitionArrayParallel(int a[], int si, int ei){
+    
+    int count_small = 0;
+
+    #pragma omp parallel for reduction(+:count_small)
+    for (int i = (si + 1); i <= ei; i++) {
+        if (a[i] <= a[si]) {
+            count_small++;
+        }
+    }
+
+    int c = si + count_small;
+    int temp = a[c];
+    a[c] = a[si];
+    a[si] = temp;
+
+    int i=si, j=ei;
+
+    while(i<c && j>c){
+        if(a[i]<= a[c]){
+            i++;
+        }
+        else if(a[j]>a[c]) {
+            j--;
+        }
+        else {
+            int temp_1=a[j];
+            a[j]=a[i];
+            a[i]=temp_1;
+
+            i++;
+            j--;
+        }
+    }
+    return c;
+}
+
 void quickSortParallel(int a[], int si, int ei, int depth) {
     if (si >= ei) return;
 
-    int c = partition_array(a, si, ei);
+    int c = partitionArrayParallel(a, si, ei);
 
     #pragma omp task shared(a)
     quickSortParallel(a, si, c - 1, depth - 1);
