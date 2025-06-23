@@ -65,6 +65,8 @@ The following plots show the execution time of each algorithm for various input 
 
 ## Samples - INSERT THE GIF
 
+Note that the difference in time for the serial and parallel times in the visualizer IS NOT REPRESENTATIVE of the true time difference. Here, we slow down both versions to allow rendering and improve visibility.
+
 - Selection Sort - serial  
     ![](samples/selectionSortSerial.gif)
 
