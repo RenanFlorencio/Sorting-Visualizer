@@ -230,75 +230,75 @@ void inplaceHeapSort(int* input, int n)
     }
 }
 
-void heapify_parallel(int* arr, int n, int i)
-{
+void heapifyParallel(int* input, int n, int i) {
     int largest = i;
-    int left = 2 * i + 1;
-    int right = 2 * i + 2;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
 
-    if (left < n && arr[left] > arr[largest])
-        largest = left;
-    if (right < n && arr[right] > arr[largest])
-        largest = right;
+    if (l < n && input[l] > input[largest])
+        largest = l;
+    if (r < n && input[r] > input[largest])
+        largest = r;
 
-    if (largest != i)
-    {
-        std::swap(arr[i], arr[largest]);
+    if (largest != i) {
+        int temp = input[i];
+        input[i] = input[largest];
+        input[largest] = temp;
 
-        #pragma omp critical
+        #pragma omp critical 
         {
             greenIndices.insert(i);
             pinkIndices.insert(largest);
+        }
+
+        #pragma omp critical 
+        {
             visualize_parallel();
-            busywait_ms(30);
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(30));
+
+        #pragma omp critical 
+        {
             greenIndices.erase(i);
             pinkIndices.erase(largest);
         }
 
-        heapify_parallel(arr, n, largest);
+        heapifyParallel(input, n, largest);
     }
 }
 
-void heapSortParallel(int* arr, int n)
-/*
-Heap Sort builds a max-heap and repeatedly removes the largest element 
-(from the root), placing it at the end of the array. The heap size is 
-reduced each time, and the process is repeated.
-
-In this implementation, the max-heap construction is parallelized: 
-multiple internal nodes can be heapified simultaneously since their 
-subtrees do not overlap. This part is safe and effective for parallelism.
-
-However, the sorting phase (swapping the root with the last element and 
-heapifying the root) must remain sequential, because each iteration depends 
-on the heap being correctly adjusted after the previous removal.
-
-The 'heapify_parallel' function recursively restores the max-heap property 
-for the subtree rooted at index `i`. Visual feedback is handled using 
-critical sections to ensure thread-safe updates and synchronized animations.
-
-*/
-{
-    #pragma omp parallel for schedule(dynamic)
-    for (int i = n / 2 - 1; i >= 0; i--)
-    {
-        heapify_parallel(arr, n, i);
+void inplaceHeapSortParallel(int* input, int n) {
+    #pragma omp parallel for
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapifyParallel(input, n, i);
     }
 
-    for (int i = n - 1; i > 0; i--)
-    {
-        std::swap(arr[0], arr[i]);
+    for (int i = n - 1; i > 0; i--) {
+        int temp = input[0];
+        input[0] = input[i];
+        input[i] = temp;
 
         #pragma omp critical
         {
             greenIndices.insert(0);
             pinkIndices.insert(i);
+        }
+
+        #pragma omp critical
+        {
             visualize_parallel();
-            busywait_ms(40);
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(30));
+
+        #pragma omp critical
+        {
             greenIndices.erase(0);
             pinkIndices.erase(i);
         }
-        heapify_parallel(arr, i, 0); 
+
+        heapifyParallel(input, i, 0);
     }
 }
 
@@ -361,52 +361,22 @@ void quickSort(int a[], int si, int ei)
 
 }
 
-int partition_array_parallel(int a[], int si, int ei)
-{
-    int pivot = a[si];
+int partitionArrayParallel(int a[], int si, int ei) {
     int count_small = 0;
 
-    // Flags para marcar quem é menor que o pivô
-    std::vector<int> isSmaller(ei - si, 0);
-
-    // Comparações paralelas com destaque visual
-    #pragma omp parallel for reduction(+:count_small)
     for (int i = si + 1; i <= ei; i++) {
-        // Marcação de comparação
-        #pragma omp critical
-        {
-            greenIndices.insert(i);
-            pinkIndices.insert(si);
-        }
-
-        #pragma omp critical
-        {
-            visualize_parallel();
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-
-        #pragma omp critical
-        {
-            greenIndices.erase(i);
-            pinkIndices.erase(si);
-        }
-
-        if (a[i] <= pivot) {
-            isSmaller[i - (si + 1)] = 1;
+        if (a[i] <= a[si]) {
             count_small++;
         }
     }
 
     int c = si + count_small;
-
-    // Troca visualizada do pivô para a posição correta
-    std::swap(a[c], a[si]);
+    swap(a[c], a[si]);
 
     #pragma omp critical
     {
-        greenIndices.insert(c);
-        pinkIndices.insert(si);
+        greenIndices.insert(si);
+        pinkIndices.insert(c);
     }
 
     #pragma omp critical
@@ -414,27 +384,23 @@ int partition_array_parallel(int a[], int si, int ei)
         visualize_parallel();
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(70));
+    this_thread::sleep_for(chrono::milliseconds(30));
 
     #pragma omp critical
     {
-        greenIndices.erase(c);
-        pinkIndices.erase(si);
+        greenIndices.erase(si);
+        pinkIndices.erase(c);
     }
 
-    // Rearranjar os elementos à esquerda e direita do pivô (sequencial)
     int i = si, j = ei;
 
-    while (i < c && j > c)
-    {
+    while (i < c && j > c) {
         if (a[i] <= a[c]) {
             i++;
-        }
-        else if (a[j] > a[c]) {
+        } else if (a[j] > a[c]) {
             j--;
-        }
-        else {
-            std::swap(a[i], a[j]);
+        } else {
+            swap(a[i], a[j]);
 
             #pragma omp critical
             {
@@ -447,60 +413,38 @@ int partition_array_parallel(int a[], int si, int ei)
                 visualize_parallel();
             }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(70));
+            this_thread::sleep_for(chrono::milliseconds(30));
 
             #pragma omp critical
             {
                 greenIndices.erase(i);
                 pinkIndices.erase(j);
             }
-
             i++;
             j--;
         }
     }
-
     return c;
 }
 
-
-void quickSortParallel(int a[], int si, int ei, int depth)
-/*
-Quick Sort selects a pivot and partitions the array such that all elements 
-less than or equal to the pivot go to its left, and greater elements go to 
-its right. It then recursively applies the same process to the two subarrays.
-
-This parallel version optimizes the partitioning step: comparisons with 
-the pivot are done in parallel using a helper array (`isSmaller`) and 
-OpenMP reduction to count how many elements are smaller than the pivot. 
-This part is highly parallelizable and benefits from multiple threads.
-
-However, rearranging elements around the pivot (swapping from both ends) 
-remains sequential due to data dependencies between indices.
-
-Recursive calls to Quick Sort are parallelized using `#pragma omp task`, 
-limited by a depth counter (`depth`) to avoid excessive thread spawning 
-for small subarrays. While `depth > 0`, subproblems are run as tasks.
-
-All visualizations are enclosed in critical sections to ensure consistent 
-highlighting of indices and proper synchronization of animations.
-*/
-
-{
+void quickSortParallel(int a[], int si, int ei) {
     if (si >= ei)
         return;
 
-    int c = partition_array_parallel(a, si, ei);
+    int c = partitionArrayParallel(a, si, ei);
 
-    if (depth > 0) {
+    int size = ei - si;
+    if (size > 10000) {
         #pragma omp task shared(a)
-        quickSortParallel(a, si, c - 1, depth - 1);
+        quickSortParallel(a, si, c - 1);
 
         #pragma omp task shared(a)
-        quickSortParallel(a, c + 1, ei, depth - 1);
+        quickSortParallel(a, c + 1, ei);
+
+        #pragma omp taskwait
     } else {
-        quickSortParallel(a, si, c - 1, 0);
-        quickSortParallel(a, c + 1, ei, 0);
+        quickSortParallel(a, si, c - 1);
+        quickSortParallel(a, c + 1, ei);
     }
 }
 
@@ -1080,7 +1024,7 @@ void execute()
                             loadArr();
                             cout<<"\nPARALLEL QUICK SORT STARTED.\n";
                             complete=false;
-                            quickSortParallel(arr, 0, arrSize-1, 16);
+                            quickSortParallel(arr, 0, arrSize-1);
                             complete=true;
                             cout<<"\nPARALLEL QUICK SORT COMPLETE.\n";
                             break;
@@ -1088,7 +1032,7 @@ void execute()
                             loadArr();
                             cout<<"\nPARALLEL HEAP SORT STARTED.\n";
                             complete=false;
-                            inplaceHeapSort(arr, arrSize);
+                            inplaceHeapSortParallel(arr, arrSize);
                             complete=true;
                             cout<<"\nPARALLEL HEAP SORT COMPLETE.\n";
                             break;
