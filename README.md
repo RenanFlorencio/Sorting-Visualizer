@@ -35,6 +35,28 @@ g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer
 ```
 3. Follow the instructions of the Sorting Visualizer printed on the terminal: press ENTER twice to start the visualizer, and, once it starts, press the commands shown to run the desired sorting algorithm, to generate a new list or to quit the visualizer. To close the program, quit the visualizer and then write '-1' and press ENTER.
 
+## How to run runner.py
+
+The runner takes some time to finish, and the benchmarks are already in the next section of this README. However, if you'd like to benchmark it yourself, you can simply do the following:
+
+1. Compile each sorting algorithm, to make sure it works on your system. You can try to skip this step, but we observed that it can generate some errors due to different versions of glibc and other libraries, so we recommend you to do this to make sure it will work on your environment. To do this, inside the root folder (sorting-visualizer) use the following commands:
+
+```
+cd no-visualizer
+cd src
+g++ algSort.cpp -w -lSDL2 -o algSort -fopenmp
+```
+
+Compile each of the sorting algorithms, substituting "alg" for their name. For example: `g++ heapSort.cpp -w -lSDL2 -o heapSort -fopenmp`. This will compile both the serial and parallel versions of each algorithm.
+
+2. Move the generated files to the no-visualiser folder
+
+3. Run the followng:
+
+```
+python3 runner.py
+```
+
 ## Bechmarks
 
 ### Speedup Table
@@ -110,46 +132,7 @@ Note that the difference in time for the serial and parallel times in the visual
     ![](samples/bitonicSortParallel.gif)
 
 
-## How to run runner.py
-
-The runner takes some time to finish, and the benchmarks are already in this README. However, if you'd like to benchmark it yourself, you can simply do the following:
-
-1. Compile each sorting algorithm, to make sure it works on your system. You can try to skip this step, but we observed that it can generate some errors due to different versions of glibc and other libraries, so we recommend you to do this to make sure it will work on your environment. To do this, inside the root folder (sorting-visualizer) use the following commands:
-
-```
-cd no-visualizer
-cd src
-g++ algSort.cpp -w -lSDL2 -o algSort -fopenmp
-```
-
-Compile each of the sorting algorithms, substituting "alg" for their name. For example: `g++ heapSort.cpp -w -lSDL2 -o heapSort -fopenmp`. This will compile both the serial and parallel versions of each algorithm.
-
-2. Move the generated files to the no-visualiser folder
-
-
-3. Run the followng:
-
-```
-python3 runner.py
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### This is the orignal README for this project, which explains better how the Sorting Visualizer works:
+# This is the orignal README for this project, which explains better how the Sorting Visualizer works:
 
 [Download](https://github.com/dipesh-m/Sorting-Visualizer/releases/tag/1.0)
 
@@ -160,14 +143,14 @@ In this implementation of sorting visualizer, we'll be looking at some of these 
 The sorting algorithms covered here are Selection Sort, Insertion Sort, Bubble Sort, Merge Sort, Quick Sort and Heap Sort.
 The list size is fixed to 130 elements. You can randomize the list and select any type of sorting algorithm to call on the list from the given options. Here, all sorting algorithms will sort the elements in ascending order. The sorting time being visualized for an algorithm is not exactly same as their actual time complexities. The relatively faster algorithms like Merge Sort, etc. have been delayed so that they could be properly visualized.
 
-# How to run:-
+## How to run:-
 
 Option 1.) You can run Sorting Visualizer directly from the release. Download the release and run the .exe application i.e., Sorting Visualizer.exe -> [Download](https://github.com/dipesh-m/Sorting-Visualizer/releases/tag/1.0)
 
 Option 2.) You can also run Sorting Visualizer using the C++ source code available in the repository i.e., Sorting Visualizer.cpp but you will need to install and setup the SDL2 library first. I recommend you follow Lazy Foo' Productions' tutorial to setup SDL2 Library. PLEASE NOTE THAT the tutorial follows to setup SDL2 32-bit library but to run Sorting Visualizer, you have to use the 64-bit library. Just use x86_64-w64-mingw32 folder instead of i686-w64-mingw32 to setup the SDL2 files.-> [How to download and setup SDL2 library](http://lazyfoo.net/tutorials/SDL/01_hello_SDL/index.php).
 After setting up the SDL2 library, just include the Sorting Visualizer.cpp file from the repository in your project with the build options as mentioned in the tutorial and build and run the project.
 
-# Controls:-
+## Controls:-
 
 WARNING: Giving repetitive commands may cause latency and the visualizer may behave unexpectedly. Please give a new command only after the current command's execution is done.
 
@@ -181,7 +164,7 @@ Available Controls inside Sorting Visualizer:-
 - Use 6 to start Heap Sort Algorithm.
 - Use q to exit out of Sorting Visualizer
 
-# Samples
+## Samples
 
 - Sample 1 (Insertion Sort)
 
