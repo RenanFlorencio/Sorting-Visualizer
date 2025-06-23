@@ -9,13 +9,11 @@ def main():
     # Since bubble and selection sort are too slow, use the smaller number of elements
     # The values are the exponents of 2 for the number of elements
 
-    # n_elements_array = [12, 14, 15, 16, 17, 18, 19, 20, 21] # Merge, Bitonic, and Heap sort
-    # n_elements_array = [10, 12, 14, 15, 16] # Bubble, Selection, and Quick sort
-    n_elements_array = [5, 6, 7, 8, 9, ] # Quick sort
+    # n_elements_array = [12, 14, 15, 16, 17, 18, 19, 20, 21] # Merge, Bitonic, Heap and Quick
+    n_elements_array = [10, 12, 14, 15, 16] # Bubble, Selection
     
-    # sort_functions = ['mergeSort', 'bitonicSort', 'heapSort']
-    # sort_functions = ['bubbleSort', 'selectionSort', 'quickSort']
-    sort_functions = ['quickSort']
+    # sort_functions = ['quickSort', 'heapSort', 'mergeSort', 'bitonicSort']
+    sort_functions = ['bubbleSort', 'selectionSort']
 
     n_iterations = 10 # Number of iterations for each number of elements for each sort
     serial_time = {}
@@ -70,8 +68,8 @@ def main():
         print(f"Parallel mean for {sort}: {p_mean}")
 
         plt.figure()
-        plt.plot(n_elements_array, s_mean, label='Serial Time', color='r')
-        plt.plot(n_elements_array, p_mean, label='Parallel Time', color='b')
+        plt.plot(n_elements_array, s_mean, label='Serial Time', color='r', marker='o')
+        plt.plot(n_elements_array, p_mean, label='Parallel Time', color='b', marker='x')
         plt.fill_between(n_elements_array, p_mean - p_ci, p_mean + p_ci, color='b', alpha=0.2)
         plt.fill_between(n_elements_array, s_mean - s_ci, s_mean + s_ci, color='r', alpha=0.2)
         plt.xscale('log')
@@ -79,6 +77,8 @@ def main():
         plt.xlabel("Number of Elements (log scale)")
         plt.ylabel("Time (ms)")
         plt.legend(["Serial Time", "Parallel Time"])
+        plt.xticks(n_elements_array, [f'2^{x}' for x in n_elements_array])
+        plt.minorticks_off()
         plt.tight_layout()
         plt.savefig(f"plots/{sort}_time.png")
         plt.close()
