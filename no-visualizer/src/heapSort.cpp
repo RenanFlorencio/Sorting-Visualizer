@@ -69,56 +69,42 @@ void inplaceHeapSort(int* input, int n)
     }
 }
 
-void heapify_parallel(int* arr, int n, int i)
-{
+
+void heapifyParallel(int* input, int n, int i) {
     int largest = i;
-    int left = 2 * i + 1;
-    int right = 2 * i + 2;
+    int l = 2*i + 1;
+    int r = 2*i + 2;
 
-    if (left < n && arr[left] > arr[largest])
-        largest = left;
-    if (right < n && arr[right] > arr[largest])
-        largest = right;
+    if (l < n && input[l] > input[largest])
+        largest = l;
+    if (r < n && input[r] > input[largest])
+        largest = r;
 
-    if (largest != i)
-    {
-        std::swap(arr[i], arr[largest]);
-        heapify_parallel(arr, n, largest);
+    if (largest != i) {
+        int temp = input[i];
+        input[i] = input[largest];
+        input[largest] = temp;
+        heapifyParallel(input, n, largest);
     }
 }
 
-void heapSortParallel(int* arr, int n)
-/*
-Heap Sort builds a max-heap and repeatedly removes the largest element 
-(from the root), placing it at the end of the array. The heap size is 
-reduced each time, and the process is repeated.
-
-In this implementation, the max-heap construction is parallelized: 
-multiple internal nodes can be heapified simultaneously since their 
-subtrees do not overlap. This part is safe and effective for parallelism.
-
-However, the sorting phase (swapping the root with the last element and 
-heapifying the root) must remain sequential, because each iteration depends 
-on the heap being correctly adjusted after the previous removal.
-
-The 'heapify_parallel' function recursively restores the max-heap property 
-for the subtree rooted at index `i`. Visual feedback is handled using 
-critical sections to ensure thread-safe updates and synchronized animations.
-
-*/
-{
-    #pragma omp parallel for schedule(dynamic)
-    for (int i = n / 2 - 1; i >= 0; i--)
-    {
-        heapify_parallel(arr, n, i);
+void inplaceHeapSortParallel(int* input, int n) {
+    // Construção paralela do max-heap
+    #pragma omp parallel for
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapifyParallel(input, n, i);
     }
 
-    for (int i = n - 1; i > 0; i--)
-    {
-        std::swap(arr[0], arr[i]);
-        heapify_parallel(arr, i, 0); 
+    // Ordenação (sequencial)
+    for (int i = n - 1; i >= 0; i--) {
+        int temp = input[0];
+        input[0] = input[i];
+        input[i] = temp;
+
+        heapifyParallel(input, i, 0);
     }
 }
+
 
 void fillRandom(int* arr, int size, std::mt19937& gen, std::uniform_int_distribution<>& dist) {
     for (int i = 0; i < size; ++i) {
@@ -153,12 +139,12 @@ int main(int argc, char* argv[]) {
     std::copy(arrCopy, arrCopy + n, arr);
 
     auto startB = std::chrono::high_resolution_clock::now();
-    heapSortParallel(arr, n);
+    inplaceHeapSortParallel(arr, n);
     auto endB = std::chrono::high_resolution_clock::now();
     auto durationB = std::chrono::duration_cast<std::chrono::milliseconds>(endB - startB).count();
 
-    std::cout << "Merge Sort time: " << durationA << " ms\n";
-    std::cout << "Merge Sort Parallel time: " << durationB << " ms\n";
+    std::cout << "Heap Sort time: " << durationA << " ms\n";
+    std::cout << "Heap Sort Parallel time: " << durationB << " ms\n";
 
     delete[] arr;
     delete[] arrCopy;
