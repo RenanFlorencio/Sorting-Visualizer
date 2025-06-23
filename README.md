@@ -32,7 +32,7 @@ sudo apt install libsdl2-dev
 ```
 2. Run the following command:
 ```
-g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer
+g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer -fopenmp
 ./visualizer
 ```
 3. Follow the instructions of the Sorting Visualizer printed on the terminal: press ENTER twice to start the visualizer, and, once it starts, press the commands shown to run the desired sorting algorithm, to generate a new list or to quit the visualizer. To close the program, quit the visualizer and then write '-1' and press ENTER.
