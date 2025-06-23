@@ -87,20 +87,24 @@ The following plots show the execution time of each algorithm for various input 
 ![](no-visualizer/plots/quickSort_time.png)
 ![](no-visualizer/plots/heapSort_time.png)
 
-## Samples - INSERT THE GIF
+## Example executions of serial and parallel algorithms
 
 Note that the difference in time for the serial and parallel times in the visualizer IS NOT REPRESENTATIVE of the true time difference. Here, we slow down both versions to allow rendering and improve visibility.
 
 - Selection Sort - serial  
+
     ![](samples/selectionSortExample.gif)
 
 - Selection Sort - parallel  
+
     ![](samples/selectionSortParallelExample.gif)
 
 - Quick Sort - serial  
+
     ![](samples/quickSortExample.gif)
 
 - Quick Sort - parallel  
+
     ![](samples/quickSortParallelExample.gif)
 
 
