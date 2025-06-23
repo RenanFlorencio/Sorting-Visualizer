@@ -2,6 +2,8 @@
 
 This is the final project for Unicamp MC970 course, done by Felipe Brabes, Gabriela Jacob and Renan Florencio. It is based on [Dipesh Mann's implementation of Sorting Visualizer](https://github.com/dipesh-m/Sorting-Visualizer), with some changes described below.
 
+**The full report in PDF is available in the repository on the `report.pdf` file.**
+
 The original code done by Dipesh Mann is a sorting algorithms visualizer, which provided a visualization of different sorting algorithms in C++ with SDL2 Library. The code originally implemented the following sorting algorithms:
 
 - Selection Sort
