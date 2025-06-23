@@ -38,7 +38,7 @@ g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer
 ## Bechmarks
 
 ### Speedup Table
-This table shows a comparison between parallel algorithms and their serial counterparts.
+This table shows a comparison between parallel algorithms and their serial counterparts. Here, greater speedup does not mean better time, it just shows by how much we were able to improve the serial time by using a parallel version.
 
 | Array size | BubbleSort | SelectionSort | BitonicSort | MergeSort | QuickSort | HeapSort |
 |-------------|------------|---------------|-------------|-----------|-----------|----------|
