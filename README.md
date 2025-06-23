@@ -35,7 +35,33 @@ g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer
 ```
 3. Follow the instructions of the Sorting Visualizer printed on the terminal: press ENTER twice to start the visualizer, and, once it starts, press the commands shown to run the desired sorting algorithm, to generate a new list or to quit the visualizer. To close the program, quit the visualizer and then write '-1' and press ENTER.
 
-## Bechmarks - INSERT THE TABLES / PLOTS
+## Bechmarks
+
+### Speedup Table
+This table shows a comparison between parallel algorithms and their serial counterparts.
+
+| Array size | BubbleSort | SelectionSort | BitonicSort | MergeSort | QuickSort | HeapSort |
+|-------------|------------|---------------|-------------|-----------|-----------|----------|
+| 2^10        | 0.01x      | 0.00x         | --          | --        | --        | --       |
+| 2^12        | 0.43x      | 0.04x         | 0.14x       | 0.01x     | 0.06x     | 0.01x    |
+| 2^14        | 2.63x      | 1.11x         | 0.51x       | 0.25x     | 0.35x     | 0.22x    |
+| 2^15        | 4.98x      | 1.29x         | 0.95x       | 0.46x     | 0.57x     | 0.36x    |
+| 2^16        | 5.97x      | 1.84x         | 1.73x       | 1.14x     | 1.58x     | 0.55x    |
+| 2^17        | --         | --            | 1.88x       | 2.06x     | 2.55x     | 1.07x    |
+| 2^18        | --         | --            | 1.49x       | 3.17x     | 3.55x     | 1.09x    |
+| 2^19        | --         | --            | 1.62x       | 2.91x     | 3.17x     | 0.96x    |
+| 2^20        | --         | --            | 1.66x       | 2.82x     | 2.69x     | 0.94x    |
+| 2^21        | --         | --            | 1.79x       | 2.99x     | 3.03x     | 0.94x    |
+
+### Execution Time Plots
+The following plots show the execution time of each algorithm for various input sizes. Ten runs were performed for each input size and the 95% confidence interval is shown.
+
+![](no-visualizer/plots/bubbleSort_time.png)
+![](no-visualizer/plots/selectionSort_time.png)
+![](no-visualizer/plots/mergeSort_time.png)
+![](no-visualizer/plots/bitonicSort_time.png)
+![](no-visualizer/plots/quickSort_time.png)
+![](no-visualizer/plots/heapSort_time.png)
 
 ## Samples - INSERT THE GIF
 
