@@ -92,46 +92,17 @@ The following plots show the execution time of each algorithm for various input 
 Note that the difference in time for the serial and parallel times in the visualizer IS NOT REPRESENTATIVE of the true time difference. Here, we slow down both versions to allow rendering and improve visibility.
 
 - Selection Sort - serial  
-    ![](samples/selectionSortSerial.gif)
+    ![](samples/selectionSortExample.gif)
 
 - Selection Sort - parallel  
-    ![](samples/selectionSortParallel.gif)
-
-- Insertion Sort - serial  
-    ![](samples/insertionSortSerial.gif)
-
-- Insertion Sort - parallel  
-    ![](samples/insertionSortParallel.gif)
-
-- Bubble Sort - serial  
-    ![](samples/bubbleSortSerial.gif)
-
-- Bubble Sort - parallel  
-    ![](samples/bubbleSortParallel.gif)
-
-- Merge Sort - serial  
-    ![](samples/mergeSortSerial.gif)
-
-- Merge Sort - parallel  
-    ![](samples/mergeSortParallel.gif)
+    ![](samples/selectionSortParallelExample.gif)
 
 - Quick Sort - serial  
-    ![](samples/quickSortSerial.gif)
+    ![](samples/quickSortExample.gif)
 
 - Quick Sort - parallel  
-    ![](samples/quickSortParallel.gif)
+    ![](samples/quickSortParallelExample.gif)
 
-- Heap Sort - serial  
-    ![](samples/heapSortSerial.gif)
-
-- Heap Sort - parallel  
-    ![](samples/heapSortParallel.gif)
-
-- Bitonic Sort - serial  
-    ![](samples/bitonicSortSerial.gif)
-
-- Bitonic Sort - parallel  
-    ![](samples/bitonicSortParallel.gif)
 
 
 # This is the orignal README for this project, which explains better how the Sorting Visualizer works:
