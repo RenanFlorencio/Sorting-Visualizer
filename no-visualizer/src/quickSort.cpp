@@ -10,6 +10,24 @@
 #include <mutex>
 #include <vector>
 
+/* This parallel Quick Sort algorithm implements a "divide and conquer" strategy, using OpenMP tasks for parallel execution.
+
+The main idea is:
+1.  Partition Array: 
+
+    In this subroutine, a pivot element is chosen (in this case, the first element of the sub-array),
+    and the array is reordered so that all elements less than or equal to the pivot come before it,
+    and all elements greater than the pivot come after it. This operation defines the pivot's
+    final sorted position.
+
+2.  Recursive Sorting with Parallel Tasks: 
+
+    Quick Sort algorithm then recursively sorts the sub-arrays to the left and right of the pivot.
+    For sub-arrays larger than a defined threshold (e.g., 10,000 elements), OpenMP tasks are
+    used to execute these recursive calls in parallel. This allows different parts of the array
+    to be sorted concurrently by available threads.
+    Smaller sub-arrays are sorted sequentially to avoid overhead of task creation. */
+
 int partitionArray(int a[], int si, int ei)
 {
     int count_small=0;
