@@ -32,7 +32,7 @@ sudo apt install libsdl2-dev
 ```
 2. Run the following command:
 ```
-g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer
+g++ Sorting\ Visualizer.cpp -w -lSDL2 -o visualizer -fopenmp
 ./visualizer
 ```
 3. Follow the instructions of the Sorting Visualizer printed on the terminal: press ENTER twice to start the visualizer, and, once it starts, press the commands shown to run the desired sorting algorithm, to generate a new list or to quit the visualizer. To close the program, quit the visualizer and then write '-1' and press ENTER.
@@ -87,51 +87,26 @@ The following plots show the execution time of each algorithm for various input 
 ![](no-visualizer/plots/quickSort_time.png)
 ![](no-visualizer/plots/heapSort_time.png)
 
-## Samples - INSERT THE GIF
+## Example executions of serial and parallel algorithms
 
 Note that the difference in time for the serial and parallel times in the visualizer IS NOT REPRESENTATIVE of the true time difference. Here, we slow down both versions to allow rendering and improve visibility.
 
 - Selection Sort - serial  
-    ![](samples/selectionSortSerial.gif)
+
+    ![](samples/selectionSortExample.gif)
 
 - Selection Sort - parallel  
-    ![](samples/selectionSortParallel.gif)
 
-- Insertion Sort - serial  
-    ![](samples/insertionSortSerial.gif)
-
-- Insertion Sort - parallel  
-    ![](samples/insertionSortParallel.gif)
-
-- Bubble Sort - serial  
-    ![](samples/bubbleSortSerial.gif)
-
-- Bubble Sort - parallel  
-    ![](samples/bubbleSortParallel.gif)
-
-- Merge Sort - serial  
-    ![](samples/mergeSortSerial.gif)
-
-- Merge Sort - parallel  
-    ![](samples/mergeSortParallel.gif)
+    ![](samples/selectionSortParallelExample.gif)
 
 - Quick Sort - serial  
-    ![](samples/quickSortSerial.gif)
+
+    ![](samples/quickSortExample.gif)
 
 - Quick Sort - parallel  
-    ![](samples/quickSortParallel.gif)
 
-- Heap Sort - serial  
-    ![](samples/heapSortSerial.gif)
+    ![](samples/quickSortParallelExample.gif)
 
-- Heap Sort - parallel  
-    ![](samples/heapSortParallel.gif)
-
-- Bitonic Sort - serial  
-    ![](samples/bitonicSortSerial.gif)
-
-- Bitonic Sort - parallel  
-    ![](samples/bitonicSortParallel.gif)
 
 
 # This is the orignal README for this project, which explains better how the Sorting Visualizer works:
