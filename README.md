@@ -15,7 +15,7 @@ The original code done by Dipesh Mann is a sorting algorithms visualizer, which 
 
 The main changes we did to this code was:
 
-- Optimize by implementing a parallel version for all of the sorting algorithms already implemented
+- Optimize by implementing parallel versions of the sorting algorithms already implemented
 - Implement the logic for the parallel algorithms visualization
 - Implement a different sorting algorithm (Bitonic Sort) and its parallel version
 - Implement an automated runner, which benchmarks all of the algorithms implemented and returns a table with running times for each of the algorithms, comparing the parallel and serial versions
@@ -53,7 +53,9 @@ Compile each of the sorting algorithms, substituting "alg" for their name. For e
 
 2. Move the generated files to the no-visualiser folder
 
-3. Run the followng:
+3. Open runner.py, and choose which algorithms you'd like to run. To do so, leave the line with the number of elements array (n_elements_array variable) you'd like, and comment the line you don't want. Do the same for sort_functions, leaving the one you want and commenting the one you don't want to test. We left a comment sugesting which array with the number of elements should be used while testing each algorithm, because some tests may take too long to run.
+
+4. Run the followng:
 
 ```
 python3 runner.py
@@ -64,18 +66,18 @@ python3 runner.py
 ### Speedup Table
 This table shows a comparison between parallel algorithms and their serial counterparts. Here, greater speedup does not mean better time, it just shows by how much we were able to improve the serial time by using a parallel version.
 
-| Array size | BubbleSort | SelectionSort | BitonicSort | MergeSort | QuickSort | HeapSort |
-|-------------|------------|---------------|-------------|-----------|-----------|----------|
-| 2^10        | 0.01x      | 0.00x         | --          | --        | --        | --       |
-| 2^12        | 0.43x      | 0.04x         | 0.14x       | 0.01x     | 0.06x     | 0.01x    |
-| 2^14        | 2.63x      | 1.11x         | 0.51x       | 0.25x     | 0.35x     | 0.22x    |
-| 2^15        | 4.98x      | 1.29x         | 0.95x       | 0.46x     | 0.57x     | 0.36x    |
-| 2^16        | 5.97x      | 1.84x         | 1.73x       | 1.14x     | 1.58x     | 0.55x    |
-| 2^17        | --         | --            | 1.88x       | 2.06x     | 2.55x     | 1.07x    |
-| 2^18        | --         | --            | 1.49x       | 3.17x     | 3.55x     | 1.09x    |
-| 2^19        | --         | --            | 1.62x       | 2.91x     | 3.17x     | 0.96x    |
-| 2^20        | --         | --            | 1.66x       | 2.82x     | 2.69x     | 0.94x    |
-| 2^21        | --         | --            | 1.79x       | 2.99x     | 3.03x     | 0.94x    |
+| Array size | BubbleSort | SelectionSort | BitonicSort | MergeSort | QuickSort | 
+|-------------|------------|---------------|-------------|-----------|-----------|
+| 2^10        | 0.01x      | 0.00x         | --          | --        | --        |
+| 2^12        | 0.43x      | 0.04x         | 0.14x       | 0.01x     | 0.06x     |
+| 2^14        | 2.63x      | 1.11x         | 0.51x       | 0.25x     | 0.35x     | 
+| 2^15        | 4.98x      | 1.29x         | 0.95x       | 0.46x     | 0.57x     | 
+| 2^16        | 5.97x      | 1.84x         | 1.73x       | 1.14x     | 1.58x     |
+| 2^17        | --         | --            | 1.88x       | 2.06x     | 2.55x     |
+| 2^18        | --         | --            | 1.49x       | 3.17x     | 3.55x     | 
+| 2^19        | --         | --            | 1.62x       | 2.91x     | 3.17x     | 
+| 2^20        | --         | --            | 1.66x       | 2.82x     | 2.69x     | 
+| 2^21        | --         | --            | 1.79x       | 2.99x     | 3.03x     |
 
 ### Execution Time Plots
 The following plots show the execution time of each algorithm for various input sizes. Ten runs were performed for each input size and the 95% confidence interval is shown.
@@ -85,7 +87,6 @@ The following plots show the execution time of each algorithm for various input 
 ![](no-visualizer/plots/mergeSort_time.png)
 ![](no-visualizer/plots/bitonicSort_time.png)
 ![](no-visualizer/plots/quickSort_time.png)
-![](no-visualizer/plots/heapSort_time.png)
 
 ## Example executions of serial and parallel algorithms
 
