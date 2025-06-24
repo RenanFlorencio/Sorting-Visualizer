@@ -230,78 +230,6 @@ void inplaceHeapSort(int* input, int n)
     }
 }
 
-void heapifyParallel(int* input, int n, int i) {
-    int largest = i;
-    int l = 2 * i + 1;
-    int r = 2 * i + 2;
-
-    if (l < n && input[l] > input[largest])
-        largest = l;
-    if (r < n && input[r] > input[largest])
-        largest = r;
-
-    if (largest != i) {
-        int temp = input[i];
-        input[i] = input[largest];
-        input[largest] = temp;
-
-        #pragma omp critical 
-        {
-            greenIndices.insert(i);
-            pinkIndices.insert(largest);
-        }
-
-        #pragma omp critical 
-        {
-            visualize_parallel();
-        }
-
-        this_thread::sleep_for(chrono::milliseconds(30));
-
-        #pragma omp critical 
-        {
-            greenIndices.erase(i);
-            pinkIndices.erase(largest);
-        }
-
-        heapifyParallel(input, n, largest);
-    }
-}
-
-void inplaceHeapSortParallel(int* input, int n) {
-    #pragma omp parallel for
-    for (int i = n / 2 - 1; i >= 0; i--) {
-        heapifyParallel(input, n, i);
-    }
-
-    for (int i = n - 1; i > 0; i--) {
-        int temp = input[0];
-        input[0] = input[i];
-        input[i] = temp;
-
-        #pragma omp critical
-        {
-            greenIndices.insert(0);
-            pinkIndices.insert(i);
-        }
-
-        #pragma omp critical
-        {
-            visualize_parallel();
-        }
-
-        this_thread::sleep_for(chrono::milliseconds(30));
-
-        #pragma omp critical
-        {
-            greenIndices.erase(0);
-            pinkIndices.erase(i);
-        }
-
-        heapifyParallel(input, i, 0);
-    }
-}
-
 
 int partition_array(int a[], int si, int ei)
 {
@@ -1030,14 +958,6 @@ void execute()
                             break;
                         case(SDLK_e):
                             loadArr();
-                            cout<<"\nPARALLEL HEAP SORT STARTED.\n";
-                            complete=false;
-                            inplaceHeapSortParallel(arr, arrSize);
-                            complete=true;
-                            cout<<"\nPARALLEL HEAP SORT COMPLETE.\n";
-                            break;
-                        case(SDLK_f):
-                            loadArr();
                             cout<<"\nPARALLEL BITONIC SORT STARTED.\n";
                             complete=false;
                             bitonicSortParallel(arr, arrSize);
@@ -1068,8 +988,7 @@ bool controls()
          <<"    Use b to start Parallel Bubble Sort Algorithm.\n"
          <<"    Use c to start Parallel Merge Sort Algorithm.\n"
          <<"    Use d to start Parallel Quick Sort Algorithm.\n"
-         <<"    Use e to start Parallel Heap Sort Algorithm.\n"
-         <<"    Use f to start Parallel Bitonic Sort Algorithm.\n"
+         <<"    Use e to start Parallel Bitonic Sort Algorithm.\n"
          <<"    Use q to exit out of Sorting Visualizer\n\n"
 
          <<"WARNING: Giving repetitive commands may cause latency and the visualizer may behave unexpectedly. Please give a new command only after the current command's execution is done.\n\n"
